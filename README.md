@@ -1,2 +1,0 @@
-# Trustel
-sistema de tickets
