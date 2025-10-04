@@ -1,8 +1,10 @@
-import mysql from "mysql2/promise";  // 🔹 Conexión a MySQL
-import bcrypt from "bcrypt";      
+import oracledb from "oracledb";
+import bcrypt from "bcrypt";
 
 export const loginController = {
   async processLogin(req) {
+    let connection;
+
     try {
       const body = await req.json();
       const { usuario, password } = body;
@@ -15,51 +17,44 @@ export const loginController = {
         );
       }
 
-      // 2️⃣ Conectarse a la base de datos
-      //    🔹 Cambia los valores según tu configuración local
-      const connection = await mysql.createConnection({
-        host: "localhost",   // 🔹 Cambia si usas otro servidor (por ej. "127.0.0.1" o una URL remota)
-        user: "root",        // 🔹 Cambia por tu usuario de MySQL
-        password: "",        // 🔹 Cambia por tu contraseña
-        database: "tickets", // 🔹 Cambia por el nombre de tu base de datos (por ej. "miApp", "usuariosDB", etc.)
+      // 2️⃣ Conectarse a la base de datos Oracle
+      connection = await oracledb.getConnection({
+        user: "TICKETUSER",          // 🔹 Usuario de Oracle
+        password: "B4b1l0n14",       // 🔹 Contraseña
+        connectString: "localhost:1521/XEPDB1", // 🔹 Host:Puerto/Servicio
       });
 
-      // 3️⃣ Buscar al usuario en la base de datos
-      //    🔹 Cambia 'usuarios' por el nombre de tu tabla
-      //    🔹 Cambia 'usuario' por la columna donde guardas el nombre o correo
-      const [rows] = await connection.execute(
-        "SELECT * FROM usuarios WHERE usuario = ?",
+      // 3️⃣ Buscar al usuario en la tabla
+      const result = await connection.execute(
+        `SELECT usuario, password FROM usuarios WHERE usuario = :usuario`,
         [usuario]
       );
 
-      // 4️⃣ Si no se encuentra ningún usuario, devuelve error
-      if (rows.length === 0) {
-        await connection.end();
+      // 4️⃣ Si no se encuentra ningún usuario
+      if (result.rows.length === 0) {
         return new Response(
           JSON.stringify({ error: "Usuario o contraseña incorrectos" }),
           { status: 400, headers: { "Content-Type": "application/json" } }
         );
       }
 
-      // 5️⃣ Comparar la contraseña escrita con la guardada (encriptada)
-      //    🔹 Cambia 'password' por el nombre real de la columna donde guardas la contraseña encriptada
-      const user = rows[0];
-      const match = await bcrypt.compare(password, user.password);
+      // ⚠️ Importante: en Oracle los resultados vienen como arrays, no objetos
+      // Por eso debes acceder así:
+      const [dbUsuario, dbPassword] = result.rows[0];
+
+      // 5️⃣ Comparar la contraseña ingresada con la encriptada
+      const match = await bcrypt.compare(password, dbPassword);
 
       if (!match) {
-        await connection.end();
         return new Response(
           JSON.stringify({ error: "Usuario o contraseña incorrectos" }),
           { status: 400, headers: { "Content-Type": "application/json" } }
         );
       }
 
-      // 6️⃣ Cerrar conexión después de usarla
-      await connection.end();
-
-      // 7️⃣ Si todo está bien, enviar respuesta exitosa
+      // 6️⃣ Respuesta exitosa
       return new Response(
-        JSON.stringify({ mensaje: "Bienvenido, inicio de sesión exitoso" }),
+        JSON.stringify({ mensaje: `Bienvenido ${dbUsuario}, inicio de sesión exitoso` }),
         { status: 200, headers: { "Content-Type": "application/json" } }
       );
 
@@ -69,6 +64,14 @@ export const loginController = {
         JSON.stringify({ error: "Error interno del servidor" }),
         { status: 500, headers: { "Content-Type": "application/json" } }
       );
+    } finally {
+      if (connection) {
+        try {
+          await connection.close();
+        } catch (err) {
+          console.error("Error cerrando la conexión:", err);
+        }
+      }
     }
   }
 };
