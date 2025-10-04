@@ -12,6 +12,11 @@ const server = Bun.serve({
     if (url.pathname.startsWith("/login")){
       return loginRoute(req); // dirige al login 
     }
+
+    if (url.pathname.startsWith("/register")){
+      return registerRoute(req);
+    }
+    
     if (url.pathname.startsWith("/tickets")){
       return ticketsRoute(req); // dirige a los tickets
     }

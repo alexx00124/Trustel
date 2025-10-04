@@ -1,10 +1,11 @@
 import { loginController } from "../controllers/loginController.js";
 
-export function loginRoute(req){
-  const url = new URL (req.url);
+export function loginRoute(req) {
+  const url = new URL(req.url);
 
-  if (url.method === "POST" && url.pathname === "/login"){
-    return loginController.procesLogun(req);
+  if (req.method === "POST" && url.pathname === "/login") {
+    return loginController.processLogin(req);
   }
-  return new Response ("metodo no soportado en /login", {status:405});
+
+  return new Response("Método no soportado en /login", { status: 405 });
 }
