@@ -1,5 +1,5 @@
 import oracledb from "oracledb";
-import util from "util"; // 👈 necesario para convertir objetos complejos
+import util from "util";
 
 export const ticketsRoute = async (req) => {
   let connection;
@@ -13,12 +13,11 @@ export const ticketsRoute = async (req) => {
 
     console.log("✅ Conectado correctamente a Oracle Database");
 
-    // 🔹 Ejecutar la consulta y devolver objetos planos
+    
     const result = await connection.execute(`SELECT * FROM tickets`, [], {
       outFormat: oracledb.OUT_FORMAT_OBJECT,
     });
-
-    // 🔹 Convertir filas a datos serializables sin ciclos
+s
     const data = result.rows.map((row) => {
       const obj = {};
       for (const key in row) {
@@ -29,14 +28,13 @@ export const ticketsRoute = async (req) => {
         } else if (value instanceof Date) {
           obj[key] = value.toISOString(); // fechas
         } else {
-          // Evita ciclos y objetos internos de Oracle
+      
           obj[key] = util.inspect(value, { depth: 2 });
         }
       }
       return obj;
     });
 
-    // 🔹 Devolver respuesta JSON válida
     return new Response(JSON.stringify(data), {
       headers: { "Content-Type": "application/json" },
       status: 200,

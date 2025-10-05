@@ -1,15 +1,22 @@
 {
   "name": "backend",
+  "version": "1.0.0",
+  "description": "Servidor backend con Bun, OracleDB y ngrok",
   "module": "src/index.js",
-  "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "private": true,
   "type": "module",
+  "private": true,
   "scripts": {
-    "dev": "bun run --watch src/index.js"
+    "dev": "bun run --watch src/index.js",
+    "start": "bun run src/index.js",
+    "tunnel": "ngrok start --config C:/Users/ADMIN/.ngrok2/ngrok.yml --all",
+    "dev:tunnel": "concurrently \"bun run src/index.js\" \"ngrok start --config C:/Users/ADMIN/.ngrok2/ngrok.yml --all\""
   },
   "dependencies": {
-    "bcrypt": "^6.0.0"
+    "bcrypt": "^6.0.0",
+    "oracledb": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "concurrently": "^8.2.2"
   }
 }
