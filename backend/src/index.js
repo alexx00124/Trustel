@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { ticketsRoute } from "./routes/ticketsRoutes.js";
 import { loginRoute } from "./routes/login.js";
 import { registerRoute } from "./routes/register.js";
@@ -35,6 +36,6 @@ const server = Bun.serve({
   },
 });
 
-console.log(`✅ Servidor Bun corriendo en: http://localhost:${server.port}/tickets`);
+console.log(`Servidor Bun corriendo en: http://localhost:${server.port}`);
 
 

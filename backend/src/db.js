@@ -1,3 +1,4 @@
+import "dotenv/config";
 import oracledb from "oracledb";
 
 // Conexión como SUPER ADMIN (SYS)
