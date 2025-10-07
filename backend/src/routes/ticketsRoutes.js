@@ -17,7 +17,7 @@ export const ticketsRoute = async (req) => {
     const result = await connection.execute(`SELECT * FROM tickets`, [], {
       outFormat: oracledb.OUT_FORMAT_OBJECT,
     });
-s
+
     const data = result.rows.map((row) => {
       const obj = {};
       for (const key in row) {

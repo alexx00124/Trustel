@@ -7,7 +7,7 @@ export async function getSysConnection() {
     const connection = await oracledb.getConnection({
       user: process.env.SYS_USER,
       password: process.env.SYS_PASSWORD,
-      connectString: process.env.SYS_CONNECT,
+      connectString: process.env.SYS_CONNECTSTRING,
       privilege: oracledb.SYSDBA, 
     });
     console.log("✅ Conectado como SYS (SYSDBA)");
@@ -24,7 +24,7 @@ export async function getUserConnection() {
     const connection = await oracledb.getConnection({
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
-      connectString: process.env.DB_CONNECT,
+      connectString: process.env.DB_CONNECTSTRING,
     });
     console.log("✅ Conectado como TICKETUSER");
     return connection;
